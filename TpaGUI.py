@@ -1,14 +1,8 @@
-def next_list(l: list, obj: object):
-    j = l.index(obj)
-    for i in l:
-        if obj != i:
-            return i
-        else:
-            if j < len(l):
-                j += 1
-            elif j == len(l):
-                j = 0
-                i = l[0]
+def next_list(l: list, index: int):
+    if index + 1 < len(l):
+        return l[index + 1]
+    else:
+        return l[0]
 
 
 class Camera:
@@ -51,18 +45,63 @@ class Session:
         pass
 
     def change_camera(self):
-        if type(self.camera_list) == list:
-            if len(self.camera_list) > 1:
-                self.camera_on_use = next_list(self.camera_list, self.camera_on_use)
-                print(self.camera_on_use.name)
+        if len(self.camera_list) == 1 and self.camera_on_use == 0:
+            self.camera_on_use = self.camera_list[0]
+            return
+        elif len(self.camera_list) < 1:
+            return
+
+        ref = self.camera_on_use
+        self.camera_on_use = next_list(self.camera_list, self.camera_list.index(ref))
+
+
+class Main:
+    def __init__(self):
+        sesion = 0
+
+        while True:
+            __input = input(
+                """
+Para crear una sesión de VideoLlamada, ingrese ( 1 )
+Para cambiar o ingresar una cámara, ingrese ( 2 )
+Para ver que camará tiene seleccionada y ver la lista de cámaras, ingrese ( 3 )
+Para iniciar la transmición, ingrese ( 4 )
+Para terminar la transmición, ingrese ( 5 )
+Para cerrar el programa, ingrese ( 0 )
+- """
+            )
+
+            match __input:
+                case "0":
+                    break
+                case "1":
+                    sesion = Session(0,
+                                     input("Cree un nombre para la sesión "),
+                                     input("Ponga su nombre como profesor "),
+                                     int(input("Ponga un codigo para la clase ")),
+                                     input("Ponga la fecha de la clase "),
+                                     input("Ponga la hora que empezará la clase así, por ejemplo ( 00:00 ) "),
+                                     input("Ahora ponga la hora que terminará la clase "),
+                                     0,
+                                     []
+                                     )
+                    print("La sesión a sido creado correctamente")
+                case "2":
+                    if sesion == 0:
+                        print("No puede cambiar de cámara cuando no tiene un sesión creada")
+                        continue
+
+                    __input = input("Para ingrear una cámara ingrese ( 1 ) \nPara cambiar de cámara si es que tiene ingrese ( 2 ) \n")
+                    aux = max(0, len(sesion.camera_list)-1)
+
+                    if __input == "1":
+                        sesion.camera_list += [Device(input("Ingrese la marca de la cámara "), input("Ingrese su modelo "), aux, input("Ingrese el nombre para la cámara "), 
+                                                      input("ingrese su resolución por ejemplo ( 1024x784 ) "))]
+                        print("Cámara ingresada")
+                    else:
+                        sesion.change_camera()
+                        print(f"La cámara a sido cambiada a {sesion.camera_on_use}")
 
 
 if __name__ == "__main__":
-    a = Device("ada", "ada001", 0, "nicon", 2000)
-    b = Device("ada", "ada001", 0, "ffaf", 2000)
-    c = Device("ada", "ada001", 0, "lele", 2000)
-    d = Session(0, 0, 0, 0, 0, 0, 0, a, [a, b, c])
-    d.change_camera()
-    d.change_camera()
-    d.change_camera()
-    print(a.transmit())
+    Main()
